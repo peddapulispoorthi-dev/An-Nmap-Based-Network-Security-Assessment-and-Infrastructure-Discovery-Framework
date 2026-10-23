@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<nmaprun startstr="2026-10-23 12:10 UTC">
+  <host>
+    <status state="up"/>
+    <address addr="198.51.100.25" addrtype="ipv4"/>
+    <ports>
+      <port protocol="tcp" portid="443">
+        <state state="open"/>
+        <service name="https" product="Apache httpd" version="2.4.49"/>
+        <script id="vuln-test" output="VULNERABLE: CVE-2021-41773 reported by test fixture"/>
+      </port>
+    </ports>
+  </host>
+</nmaprun>

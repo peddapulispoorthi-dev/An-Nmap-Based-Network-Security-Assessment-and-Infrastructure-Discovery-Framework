@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<nmaprun startstr="2026-10-23 12:00 UTC">
+  <host>
+    <status state="up"/>
+    <address addr="192.0.2.10" addrtype="ipv4"/>
+    <address addr="00:11:22:33:44:55" addrtype="mac" vendor="Example Vendor"/>
+    <hostnames><hostname name="web.lab.example" type="user"/></hostnames>
+    <ports>
+      <port protocol="tcp" portid="22"><state state="open"/><service name="ssh" product="OpenSSH" version="8.2"/></port>
+      <port protocol="tcp" portid="80"><state state="closed"/><service name="http"/></port>
+    </ports>
+    <os><osmatch name="Linux 5.x" accuracy="96"><osclass osfamily="Linux"/></osmatch></os>
+    <trace><hop ttl="1" ipaddr="192.0.2.1" host="gateway.lab" rtt="1.2"/></trace>
+  </host>
+</nmaprun>

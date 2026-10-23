@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<nmaprun startstr="2026-10-23 12:05 UTC">
+  <host><status state="down"/><address addr="192.0.2.44" addrtype="ipv4"/></host>
+</nmaprun>
