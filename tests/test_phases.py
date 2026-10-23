@@ -21,6 +21,7 @@ def test_quick_profile_runs_discovery_and_ports_with_progress(tmp_path):
         permission=True,
         output_dir=tmp_path / "scan",
         audit_log=tmp_path / "audit.log",
+        database=tmp_path / "history.sqlite3",
         runner=fake_runner,
         progress_callback=lambda phase, state: progress.append((phase, state)),
     )
@@ -38,6 +39,7 @@ def test_permission_gate_precedes_scan_and_audit(tmp_path):
             "192.0.2.10",
             output_dir=tmp_path / "scan",
             audit_log=tmp_path / "audit.log",
+            database=tmp_path / "history.sqlite3",
             runner=lambda *_args: pytest.fail("runner must not be called"),
         )
     assert not (tmp_path / "audit.log").exists()
@@ -54,5 +56,6 @@ def test_failed_phase_returns_readable_partial_scan(tmp_path):
             permission=True,
             output_dir=tmp_path / "scan",
             audit_log=tmp_path / "audit.log",
+            database=tmp_path / "history.sqlite3",
             runner=failing_runner,
         )

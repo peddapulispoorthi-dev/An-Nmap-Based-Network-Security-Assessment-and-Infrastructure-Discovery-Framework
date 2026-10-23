@@ -1,16 +1,16 @@
 """Repeatable scan phase orchestration with permission and audit gates."""
 
 import os
-import shutil
-import tempfile
 from collections.abc import Callable
 from datetime import datetime, timezone
 from pathlib import Path
 
-from nmapfw.config import DEFAULT_AUDIT_LOG, DEFAULT_SCAN_DIR, get_profile
+from nmapfw.analyzer import analyze_scan
+from nmapfw.config import DEFAULT_AUDIT_LOG, DEFAULT_DATABASE, DEFAULT_SCAN_DIR, get_profile
 from nmapfw.models import Host, Scan
 from nmapfw.parser import parse_nmap_xml
 from nmapfw.runner import NmapError, run_nmap
+from nmapfw.storage import save_scan
 from nmapfw.validate import require_permission, validate_targets
 
 ProgressCallback = Callable[[str, str], None]
@@ -60,6 +60,7 @@ def run_scan(
     include_udp: bool = False,
     output_dir: str | Path | None = None,
     audit_log: str | Path = DEFAULT_AUDIT_LOG,
+    database: str | Path = DEFAULT_DATABASE,
     progress_callback: ProgressCallback | None = None,
     runner: Runner = run_nmap,
 ) -> Scan:
@@ -112,4 +113,6 @@ def run_scan(
     if errors:
         scan.status = "partial" if scan.hosts else "failed"
         scan.error = "; ".join(errors)
+    analyze_scan(scan)
+    save_scan(scan, database)
     return scan
