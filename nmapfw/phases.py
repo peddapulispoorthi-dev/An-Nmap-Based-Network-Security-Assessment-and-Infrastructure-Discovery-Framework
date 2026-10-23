@@ -61,6 +61,7 @@ def run_scan(
     output_dir: str | Path | None = None,
     audit_log: str | Path = DEFAULT_AUDIT_LOG,
     database: str | Path = DEFAULT_DATABASE,
+    scan_id: str | None = None,
     progress_callback: ProgressCallback | None = None,
     runner: Runner = run_nmap,
 ) -> Scan:
@@ -68,7 +69,7 @@ def run_scan(
     require_permission(permission)
     validated_targets = validate_targets(targets, allow_large=allow_large)
     selected = get_profile(profile)
-    scan = Scan(targets=validated_targets, profile=selected.name)
+    scan = Scan(targets=validated_targets, profile=selected.name, scan_id=scan_id or "")
     scan_directory = Path(output_dir) if output_dir else DEFAULT_SCAN_DIR / scan.scan_id
     scan_directory.mkdir(parents=True, exist_ok=True)
     _audit_scan(validated_targets, Path(audit_log))
