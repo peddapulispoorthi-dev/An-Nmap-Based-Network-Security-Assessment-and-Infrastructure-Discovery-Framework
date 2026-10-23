@@ -1,0 +1,7 @@
+scans/
+logs/
+tests/
+nmapfw/
+nmap_framework.py
+__pycache__/
+*.pyc
