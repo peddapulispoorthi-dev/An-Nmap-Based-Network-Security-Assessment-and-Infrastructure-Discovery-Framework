@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Scan comparison{% endblock %}
+{% block content %}
+<section class="panel"><h1>Scan comparison</h1><p>{{ older.scan_id }} → {{ newer.scan_id }}</p>
+{% for category, items in changes.items() %}<h2>{{ category|replace("_", " ")|title }} ({{ items|length }})</h2>
+<ul>{% for item in items %}<li><pre>{{ item|tojson(indent=2) }}</pre></li>{% else %}<li>None</li>{% endfor %}</ul>{% endfor %}
+</section>
+{% endblock %}

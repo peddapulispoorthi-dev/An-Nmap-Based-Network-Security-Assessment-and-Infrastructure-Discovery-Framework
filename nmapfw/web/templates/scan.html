@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Scan progress{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Scan progress</h1>
+  <p>Scan ID: <code>{{ scan.scan_id }}</code></p>
+  <p>Status: <strong id="scan-status">{{ scan.status }}</strong></p>
+  <p>Phase: <span id="scan-phase">{{ scan.phase }}</span></p>
+  <p id="scan-error" class="alert">{{ scan.error }}</p>
+  <a id="scan-result" href="{{ url_for('scan_results', scan_id=scan.scan_id) }}">View results</a>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='scan.js') }}" defer></script>{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Results · {{ scan.scan_id }}{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Scan results</h1><p>{{ scan.scan_id }} · {{ scan.status }} · Risk {{ scan.risk_score }}/100 ({{ scan.risk_label }})</p>
+  <p class="downloads">Download:
+    {% for fmt in formats %}<a href="{{ url_for('download_report', scan_id=scan.scan_id, output_format=fmt) }}">{{ fmt|upper }}</a>{% endfor %}
+  </p>
+</section>
+<section class="panel"><h2>Hosts</h2>
+  {% for host in scan.hosts %}
+  <article><h3><a href="{{ url_for('host_detail', scan_id=scan.scan_id, address=host.address) }}">{{ host.address }}</a></h3>
+    <p>Status {{ host.status }} · Risk {{ host.risk_score }}/100</p>
+    <ul>{% for port in host.ports %}<li>{{ port.number }}/{{ port.protocol }} {{ port.state }} — {{ port.service }} {{ port.product }} {{ port.version }}</li>{% endfor %}</ul>
+    {% if host.findings %}<h4>Findings</h4><ul>{% for finding in host.findings %}<li class="{{ finding.severity|lower }}"><strong>{{ finding.severity }}:</strong> {{ finding.title }} — {{ finding.remediation }}</li>{% endfor %}</ul>{% endif %}
+  </article>
+  {% else %}<p>No hosts were returned by Nmap.</p>{% endfor %}
+</section>
+<section class="panel"><h2>Traceroute topology</h2><svg id="topology" role="img" aria-label="Traceroute topology"></svg>
+<script id="topology-data" type="application/json">{{ topology|tojson }}</script></section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='topology.js') }}" defer></script>{% endblock %}
