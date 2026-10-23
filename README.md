@@ -115,3 +115,12 @@ not require Nmap or network access:
 python -m unittest discover -s tests -v
 make test
 ```
+
+## Vercel static report
+
+The `public/` directory contains a static copy of the latest Nmap practice-target
+report. The public copy intentionally omits traceroute hops to avoid publishing
+local network paths. Import this Git repository into Vercel with the
+**Other** framework preset and deploy the repository root; `vercel.json` sets
+`public/` as the output directory. This static deployment displays a saved
+report only; Vercel does not run the Python/Nmap scanner.

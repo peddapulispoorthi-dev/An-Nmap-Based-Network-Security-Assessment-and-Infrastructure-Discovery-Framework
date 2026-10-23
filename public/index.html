@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Point-in-time Nmap assessment report for the authorized Nmap practice target.">
+  <title>Network Security Assessment</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 1100px; margin: 2rem auto; padding: 0 1rem; color: #18212f; background: #f3f6fa; }
+    header, section { background: #fff; padding: 1.3rem; margin: 1rem 0; border-radius: 12px; box-shadow: 0 2px 12px #172b4d15; }
+    .cards { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .card { background: #edf2f8; padding: 1rem; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    td, th { padding: .55rem; text-align: left; border-bottom: 1px solid #dce3ec; }
+    .critical, .high { color: #a01825; }
+    .medium { color: #805000; }
+    .low { color: #28633b; }
+    small { color: #526176; }
+    .snapshot { border-left: 4px solid #3876c8; padding: .6rem 1rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Network Security Assessment</h1>
+    <div class="cards">
+      <div class="card">Target: scanme.nmap.org</div>
+      <div class="card">Hosts: 1</div>
+      <div class="card">Network risk: 40/100 (High)</div>
+      <div class="card">Status: completed</div>
+    </div>
+    <p>Scan ID: 20261023_164649_514814<br>
+      Started: 2026-10-23T16:46:49.515932Z<br>
+      Finished: 2026-10-23T16:49:53.455579Z</p>
+    <p class="snapshot">Results are a point-in-time snapshot; network state can change.
+      Findings are indicators, not proof of exploitability. Traceroute details have been omitted
+      from this public copy to avoid disclosing local network paths.</p>
+  </header>
+  <section>
+    <h2>45.33.32.156 <small>Risk: 40/100</small></h2>
+    <p>Status: up | Hostname(s): scanme.nmap.org</p>
+    <p>MAC: Unknown | Vendor: Unknown</p>
+    <p>OS matches: Not detected</p>
+    <h3>Open ports and services</h3>
+    <table>
+      <thead>
+        <tr><th>Port</th><th>State</th><th>Service</th><th>Product</th><th>Version</th><th>Extra info</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>22/tcp</td><td>open</td><td>ssh</td><td>OpenSSH</td><td>6.6.1p1 Ubuntu 2ubuntu2.13</td><td>Ubuntu Linux; protocol 2.0</td></tr>
+        <tr><td>80/tcp</td><td>open</td><td>http</td><td>Apache httpd</td><td>2.4.7</td><td>(Ubuntu)</td></tr>
+        <tr><td>9929/tcp</td><td>open</td><td>nping-echo</td><td>Nping echo</td><td></td><td></td></tr>
+      </tbody>
+    </table>
+    <h3>Prioritized findings</h3>
+    <ul>
+      <li class="high">
+        <strong>High: Outdated Apache httpd version 2.4.7</strong>
+        <p>Apache HTTP Server versions before 2.4.50 are outdated; verify vendor advisories.</p>
+        <p><b>Remediation:</b> Upgrade to a supported release and verify vendor security advisories.</p>
+      </li>
+      <li class="medium">
+        <strong>Medium: Outdated OpenSSH version 6.6.1p1 Ubuntu 2ubuntu2.13</strong>
+        <p>OpenSSH versions before 7.4 are outdated and may lack important security fixes.</p>
+        <p><b>Remediation:</b> Upgrade to a supported release and verify vendor security advisories.</p>
+      </li>
+    </ul>
+  </section>
+</body>
+</html>
