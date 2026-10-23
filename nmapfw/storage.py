@@ -2,6 +2,7 @@
 
 import json
 import sqlite3
+from contextlib import closing
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
@@ -50,7 +51,7 @@ def _connect(database: str | Path) -> sqlite3.Connection:
 def save_scan(scan: Scan, database: str | Path = DEFAULT_DATABASE) -> None:
     """Persist a scan and its hosts, ports, and findings transactionally."""
     payload = json.dumps(asdict(scan), separators=(",", ":"))
-    with _connect(database) as connection:
+    with closing(_connect(database)) as connection, connection:
         connection.execute(
             """INSERT OR REPLACE INTO scans
             (scan_id, started_at, finished_at, profile, targets, status, risk_score,
@@ -100,7 +101,7 @@ def _scan_from_payload(payload: str) -> Scan:
 
 def get_scan(scan_id: str, database: str | Path = DEFAULT_DATABASE) -> Scan:
     """Load a full scan by identifier or raise ``KeyError``."""
-    with _connect(database) as connection:
+    with closing(_connect(database)) as connection, connection:
         row = connection.execute("SELECT payload FROM scans WHERE scan_id = ?", (scan_id,)).fetchone()
     if row is None:
         raise KeyError(f"Scan {scan_id!r} was not found.")
@@ -109,7 +110,7 @@ def get_scan(scan_id: str, database: str | Path = DEFAULT_DATABASE) -> Scan:
 
 def list_scans(database: str | Path = DEFAULT_DATABASE) -> list[dict[str, Any]]:
     """Return scan history summaries, newest first."""
-    with _connect(database) as connection:
+    with closing(_connect(database)) as connection, connection:
         rows = connection.execute(
             """SELECT scan_id, started_at, finished_at, profile, targets, status,
             risk_score, risk_label, error FROM scans ORDER BY started_at DESC"""

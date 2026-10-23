@@ -1,4 +1,7 @@
 from pathlib import Path
+from xml.etree.ElementTree import ParseError
+
+import pytest
 
 from nmapfw.parser import parse_nmap_xml
 
@@ -34,3 +37,8 @@ def test_parse_nse_output_and_missing_metadata():
     port = scan.hosts[0].ports[0]
     assert port.scripts["vuln-test"].startswith("VULNERABLE")
     assert port.extra_info == ""
+
+
+def test_malformed_xml_is_reported():
+    with pytest.raises(ParseError):
+        parse_nmap_xml("<nmaprun>")

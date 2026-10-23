@@ -59,3 +59,40 @@ def test_failed_phase_returns_readable_partial_scan(tmp_path):
             database=tmp_path / "history.sqlite3",
             runner=failing_runner,
         )
+
+
+def test_standard_and_full_profiles_select_expected_phases(tmp_path, monkeypatch):
+    from nmapfw import phases
+
+    monkeypatch.setattr(phases, "has_raw_socket_privileges", lambda: False)
+    for profile, expected in (
+        ("standard", [["-sn"], ["-sT", "-sV", "--top-ports", "1000"]]),
+        (
+            "full",
+            [
+                ["-sn"],
+                ["-sT", "-sV", "-p-"],
+                ["--script", "vuln"],
+                ["--traceroute"],
+                ["-sU", "--top-ports", "50"],
+            ],
+        ),
+    ):
+        calls = []
+
+        def fake_runner(_targets, arguments, output_file):
+            calls.append(arguments)
+            Path(output_file).write_bytes(FIXTURE.read_bytes())
+
+        scan = run_scan(
+            "192.0.2.10",
+            profile,
+            permission=True,
+            output_dir=tmp_path / profile,
+            audit_log=tmp_path / f"{profile}.log",
+            database=tmp_path / f"{profile}.sqlite3",
+            runner=fake_runner,
+        )
+        assert calls == expected
+        if profile == "standard":
+            assert scan.status == "completed"

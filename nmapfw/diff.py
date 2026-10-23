@@ -23,50 +23,63 @@ def compare_scans(older: Scan, newer: Scan) -> dict[str, list[dict[str, object]]
         "new_findings": [],
         "resolved_findings": [],
     }
-    for address in sorted(old_addresses & new_addresses):
-        before, after = old_hosts[address], new_hosts[address]
-        old_ports = {(port.protocol, port.number): port for port in before.ports}
-        new_ports = {(port.protocol, port.number): port for port in after.ports}
-        for key, port in new_ports.items():
-            previous = old_ports.get(key)
-            if port.state.lower() == "open" and (
-                previous is None or previous.state.lower() != "open"
-            ):
-                result["newly_opened_ports"].append(
-                    {"host": address, "protocol": port.protocol, "port": port.number, "service": port.service}
-                )
-            elif previous and previous.state.lower() == "open" and port.state.lower() != "open":
-                result["closed_ports"].append(
-                    {"host": address, "protocol": port.protocol, "port": port.number}
-                )
-            elif previous and port.state.lower() == "open" and (
-                previous.service,
-                previous.product,
-                previous.version,
-            ) != (port.service, port.product, port.version):
-                result["changed_services"].append(
-                    {
-                        "host": address,
-                        "protocol": port.protocol,
-                        "port": port.number,
-                        "before": asdict(previous),
-                        "after": asdict(port),
-                    }
-                )
-        old_findings = {_finding_key(item): item for item in before.findings}
-        new_findings = {_finding_key(item): item for item in after.findings}
-        result["new_findings"].extend(
-            asdict(new_findings[key])
-            for key in sorted(
-                new_findings.keys() - old_findings.keys(),
-                key=lambda item: (item[0], item[1], -1 if item[2] is None else item[2], item[3]),
+    old_ports = {
+        (host.address, port.protocol, port.number): port
+        for host in older.hosts
+        for port in host.ports
+    }
+    new_ports = {
+        (host.address, port.protocol, port.number): port
+        for host in newer.hosts
+        for port in host.ports
+    }
+    for (address, protocol, number), port in new_ports.items():
+        previous = old_ports.get((address, protocol, number))
+        if port.state.lower() == "open" and (
+            previous is None or previous.state.lower() != "open"
+        ):
+            result["newly_opened_ports"].append(
+                {"host": address, "protocol": protocol, "port": number, "service": port.service}
             )
-        )
-        result["resolved_findings"].extend(
-            asdict(old_findings[key])
-            for key in sorted(
-                old_findings.keys() - new_findings.keys(),
-                key=lambda item: (item[0], item[1], -1 if item[2] is None else item[2], item[3]),
+        elif previous and port.state.lower() == "open" and (
+            previous.service,
+            previous.product,
+            previous.version,
+        ) != (port.service, port.product, port.version):
+            result["changed_services"].append(
+                {
+                    "host": address,
+                    "protocol": protocol,
+                    "port": number,
+                    "before": asdict(previous),
+                    "after": asdict(port),
+                }
             )
-        )
+    for (address, protocol, number), port in old_ports.items():
+        current = new_ports.get((address, protocol, number))
+        if port.state.lower() == "open" and (current is None or current.state.lower() != "open"):
+            result["closed_ports"].append(
+                {"host": address, "protocol": protocol, "port": number}
+            )
+
+    old_findings = {
+        _finding_key(finding): finding for host in older.hosts for finding in host.findings
+    }
+    new_findings = {
+        _finding_key(finding): finding for host in newer.hosts for finding in host.findings
+    }
+    key_order = lambda item: (
+        item[0],
+        item[1],
+        -1 if item[2] is None else item[2],
+        item[3],
+    )
+    result["new_findings"] = [
+        asdict(new_findings[key])
+        for key in sorted(new_findings.keys() - old_findings.keys(), key=key_order)
+    ]
+    result["resolved_findings"] = [
+        asdict(old_findings[key])
+        for key in sorted(old_findings.keys() - new_findings.keys(), key=key_order)
+    ]
     return result

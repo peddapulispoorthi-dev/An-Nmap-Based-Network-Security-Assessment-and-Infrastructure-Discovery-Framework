@@ -10,8 +10,6 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from flask import Flask, abort, jsonify, redirect, render_template, request, send_file, session, url_for
-from werkzeug.utils import secure_filename
-
 from nmapfw.config import DEFAULT_AUDIT_LOG, DEFAULT_DATABASE, DEFAULT_SCAN_DIR, get_profile
 from nmapfw.diff import compare_scans
 from nmapfw.models import Scan
@@ -207,7 +205,7 @@ def create_app(
             "csv": "text/csv",
             "html": "text/html",
         }
-        filename = secure_filename(f"report-{scan.scan_id}.{extensions[output_format]}")
+        filename = f"report-{scan.scan_id}.{extensions[output_format]}"
         return send_file(
             io.BytesIO(content.encode("utf-8")),
             mimetype=mimetypes[output_format],

@@ -1,7 +1,6 @@
 """Rule-based findings and transparent risk scoring."""
 
 import re
-from collections.abc import Callable
 
 from nmapfw.models import Finding, Host, Scan
 

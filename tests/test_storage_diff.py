@@ -29,10 +29,17 @@ def test_diff_reports_host_ports_services_and_findings():
         hosts=[
             Host(
                 "192.0.2.10",
-                ports=[Port(22, "tcp", "open", "ssh", "OpenSSH", "8.2"), Port(80, "tcp", "open", "http")],
+                ports=[
+                    Port(22, "tcp", "open", "ssh", "OpenSSH", "8.2"),
+                    Port(80, "tcp", "open", "http"),
+                    Port(8080, "tcp", "open", "http-alt"),
+                ],
                 findings=[Finding("Old issue", "medium", "old", "fix", host="192.0.2.10", port=80)],
             ),
-            Host("192.0.2.20"),
+            Host(
+                "192.0.2.20",
+                findings=[Finding("Removed host issue", "low", "old host", "review", host="192.0.2.20")],
+            ),
         ],
     )
     new = Scan(
@@ -47,14 +54,27 @@ def test_diff_reports_host_ports_services_and_findings():
                 ],
                 findings=[Finding("New issue", "high", "new", "patch", host="192.0.2.10", port=443)],
             ),
-            Host("192.0.2.30"),
+            Host(
+                "192.0.2.30",
+                ports=[Port(8443, "tcp", "open", "https-alt")],
+                findings=[Finding("New host issue", "low", "new host", "review", host="192.0.2.30")],
+            ),
         ],
     )
     changes = compare_scans(old, new)
     assert changes["new_hosts"] == [{"address": "192.0.2.30"}]
     assert changes["removed_hosts"] == [{"address": "192.0.2.20"}]
-    assert changes["newly_opened_ports"][0]["port"] == 443
-    assert changes["closed_ports"][0]["port"] == 80
+    assert {(item["host"], item["port"]) for item in changes["newly_opened_ports"]} == {
+        ("192.0.2.10", 443),
+        ("192.0.2.30", 8443),
+    }
+    assert {(item["host"], item["port"]) for item in changes["closed_ports"]} == {
+        ("192.0.2.10", 80),
+        ("192.0.2.10", 8080),
+    }
     assert changes["changed_services"][0]["after"]["version"] == "9.0"
-    assert changes["new_findings"][0]["title"] == "New issue"
-    assert changes["resolved_findings"][0]["title"] == "Old issue"
+    assert {item["title"] for item in changes["new_findings"]} == {"New issue", "New host issue"}
+    assert {item["title"] for item in changes["resolved_findings"]} == {
+        "Old issue",
+        "Removed host issue",
+    }

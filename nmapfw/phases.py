@@ -4,6 +4,7 @@ import os
 from collections.abc import Callable
 from datetime import datetime, timezone
 from pathlib import Path
+from xml.etree.ElementTree import ParseError
 
 from nmapfw.analyzer import analyze_scan
 from nmapfw.config import DEFAULT_AUDIT_LOG, DEFAULT_DATABASE, DEFAULT_SCAN_DIR, get_profile
@@ -104,7 +105,7 @@ def run_scan(
             phase_scan = parse_nmap_xml(xml_path, validated_targets)
             _merge_hosts(merged_hosts, phase_scan.hosts)
             callback(phase_name, "completed")
-        except (NmapError, OSError, ValueError) as exc:
+        except (NmapError, OSError, ValueError, ParseError) as exc:
             message = str(exc)
             errors.append(f"{phase_name}: {message}")
             callback(phase_name, f"failed: {message}")
