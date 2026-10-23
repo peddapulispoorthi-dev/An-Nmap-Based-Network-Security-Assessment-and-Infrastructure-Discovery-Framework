@@ -1,15 +1,12 @@
-PYTHON ?= python
+PYTHON ?= python3
 
-.PHONY: install test scan-example web
+.PHONY: install test scan-example
 
 install:
-	$(PYTHON) -m pip install -r requirements.txt
+	@echo "No Python packages required. Install Nmap separately."
 
 test:
-	$(PYTHON) -m pytest -q
+	$(PYTHON) -m unittest discover -s tests -v
 
 scan-example:
-	$(PYTHON) -m nmapfw scan scanme.nmap.org --profile quick --i-have-permission
-
-web:
-	$(PYTHON) -m nmapfw.web.app
+	$(PYTHON) nmap_framework.py scanme.nmap.org --i-have-permission

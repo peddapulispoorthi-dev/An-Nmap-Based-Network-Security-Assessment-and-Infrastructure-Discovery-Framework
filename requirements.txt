@@ -1,2 +1,1 @@
-Flask==3.1.2
-pytest==8.4.2
+# Runtime uses only the Python standard library; no packages are required.

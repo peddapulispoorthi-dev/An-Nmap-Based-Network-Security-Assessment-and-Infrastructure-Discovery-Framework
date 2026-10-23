@@ -1,8 +1,9 @@
 # Project rules
 
-- Only support authorized network assessment; require explicit user permission
-  before every scan.
-- Never use shell command construction or `shell=True` for Nmap.
-- Do not add exploitation, denial-of-service, or attack-payload functionality.
-- Validate target syntax and reject CIDR ranges broader than `/16` by default.
-- Preserve type hints, tests, clear errors, and audit logging.
+- Target Python 3.8+ and use only the Python standard library.
+- Require `--i-have-permission` before running any scan; validate target syntax
+  and bound CIDR scope unless the user explicitly adds `--allow-large`.
+- Never construct shell commands or use `shell=True` for Nmap.
+- Keep scans assessment-only: no exploitation, denial-of-service, or attack
+  payloads.
+- Preserve timestamped audit logging, raw XML, escaped HTML reports, and tests.

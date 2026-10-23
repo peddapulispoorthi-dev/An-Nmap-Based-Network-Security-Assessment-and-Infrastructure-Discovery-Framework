@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-{% block title %}Scan history{% endblock %}
-{% block content %}
-<section class="panel"><h1>Scan history</h1>
-{% if scans %}<div class="table-wrap"><table><thead><tr><th>Scan</th><th>Date</th><th>Targets</th><th>Profile</th><th>Risk</th><th>Status</th></tr></thead><tbody>
-{% for scan in scans %}<tr><td><a href="{{ url_for('scan_results', scan_id=scan.scan_id) }}">{{ scan.scan_id }}</a></td><td>{{ scan.started_at }}</td><td>{{ scan.targets|join(", ") }}</td><td>{{ scan.profile }}</td><td>{{ scan.risk_score }} {{ scan.risk_label }}</td><td>{{ scan.status }}</td></tr>{% endfor %}
-</tbody></table></div>{% else %}<p>No saved scans.</p>{% endif %}
-</section>
-{% endblock %}

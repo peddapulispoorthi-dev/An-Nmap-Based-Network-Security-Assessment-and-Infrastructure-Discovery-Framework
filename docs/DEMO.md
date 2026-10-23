@@ -1,28 +1,29 @@
-# College presentation demo script
+# CN course demo plan
 
-## Before the presentation
+## Lab preparation
 
-- Use an isolated VirtualBox host-only network containing the Kali assessment
-  VM and Metasploitable 2 target. Confirm the target address and written scope.
-- Keep both VMs off bridged/public networks. Install Nmap and this framework.
-- Install Wireshark in the Kali VM or on a capture interface attached to the
-  host-only segment. Start a capture on that interface.
-- Never use a public/production target for this demo. Do not run exploit modules.
+1. Set up a VirtualBox/VMware host-only network with Kali as the scanner and
+   Metasploitable 2 plus an Ubuntu/Windows VM as targets.
+2. Keep the vulnerable VM disconnected from bridged/public networks.
+3. Record the authorized target IP and start Wireshark on the host-only
+   interface. Ensure the scope and permission are approved in writing.
 
-## Demonstration
+## Presentation
 
-1. **Explain authorization and scope.** Show the target VM's host-only address
-   and the explicit authorization flag/checkbox. Point out `logs/audit.log`.
-2. **Run discovery and inventory.** On Kali, run:
+1. **Explain authorization.** Show that the CLI refuses to scan without
+   `--i-have-permission`. Identify the lab target and the timestamped audit log.
+2. **Run the assessment.** On Kali, execute against the approved lab address:
 
    ```bash
-   python -m nmapfw scan <METASPLOITABLE_LAB_IP> --profile standard --i-have-permission
+   sudo python3 nmap_framework.py <METASPLOITABLE_LAB_IP> --i-have-permission
    ```
 
-   Review phase progress, discovered hosts, open services, findings, and risk.
-   In the dashboard, submit the same scoped target and inspect the progress and
-   results pages.
-3. **Compare Wireshark scan traffic.** In the isolated lab only, capture:
+   For the optional NSE phase, use `--vuln` only when its checks are approved.
+   Use `--full` only if the lab scope and allotted time allow a full TCP port
+   scan. Review progress, discovered hosts, services, prioritized findings, and
+   the risk score.
+3. **Compare packet patterns.** In the isolated lab only, capture these direct
+   Nmap examples:
 
    ```bash
    sudo nmap -sS -p 22,80 <METASPLOITABLE_LAB_IP>
@@ -30,39 +31,22 @@
    sudo nmap -sU --top-ports 10 <METASPLOITABLE_LAB_IP>
    ```
 
-   Filter Wireshark for the target IP and TCP/UDP. Contrast SYN probing,
-   TCP-connect handshakes, and UDP probes. Explain that capture details depend
-   on the network, privileges, and target responses. These comparison commands
-   are only for the isolated, authorized lab.
-4. **Open a report.** Use the report downloads in the web results page, or run:
-
-   ```bash
-   python -m nmapfw report <SCAN_ID> --format html --out ./demo-report.html
-   ```
-
-   Open the HTML file and review the point-in-time snapshot note, risk score,
-   service table, remediation text, and traceroute path if available.
-5. **Apply a defensive fix.** Choose one low-risk lab finding, such as disabling
-   an unused exposed service or restricting its host firewall rule. Make only a
-   configuration change you understand; do not exploit or modify the VM beyond
-   the agreed lab exercise.
-6. **Rescan and compare.** Repeat the same profile and target after the fix,
-   then compare the saved scan IDs:
-
-   ```bash
-   python -m nmapfw scan <METASPLOITABLE_LAB_IP> --profile standard --i-have-permission
-   python -m nmapfw diff <BEFORE_SCAN_ID> <AFTER_SCAN_ID>
-   ```
-
-   Show the newly closed port or other observed change. Explain that a diff
-   reflects Nmap's observations and that service changes may require manual
-   confirmation.
-7. **Close with limitations.** Emphasize written authorization, isolated scope,
-   heuristic scoring, banner/version uncertainty, and the fact that this tool
-   does not verify fixes by exploitation.
+   Filter Wireshark for the lab target and TCP/UDP. Compare SYN probing,
+   TCP-connect handshakes, and UDP probes. This project does not run a UDP scan;
+   the UDP example is separate and should only be run within the approved lab.
+4. **Inspect reports.** Open `scans/<timestamp>/report.html` in a browser and
+   inspect `report.json`. Discuss the snapshot note, service inventory,
+   severity, remediation, and any available OS/traceroute data.
+5. **Demonstrate defensive remediation.** Choose a finding (for example, an
+   unnecessary Telnet service), have the lab owner approve the change, disable
+   or firewall it, then rerun the same assessment. Compare the reports
+   manually; automated diffing is outside the MVP.
+6. **Close with limitations.** Explain how firewalls/IDS, UDP behavior, banner
+   uncertainty, and permissions affect observations. A finding is not proof of
+   exploitability, and the framework does not execute exploits.
 
 ## Cleanup
 
-Stop the capture, shut down the lab VMs, retain or remove the generated reports
-according to the course's data-handling rules, and keep the vulnerable target
-off public/bridged networks.
+Stop the capture, shut down the lab VMs, and handle generated reports according
+to course data-handling requirements. Keep the vulnerable VM off public and
+bridged networks.
